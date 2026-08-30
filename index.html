@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kompletna Dokumentacja Techniczna - Aplikacja Analizująco-Kalkulująca Płace (MVP)</title>
+    <title>Dokumentacja Techniczna</title>
     <script type="module">
       import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
       mermaid.initialize({ startOnLoad: true });
@@ -50,7 +50,6 @@
 
     <div class="section">
         <h2>2. Struktura Danych (data.json)</h2>
-        <p>Główną i jedyną bazą danych dla wymagań MVP jest płaski plik <code>data.json</code> przetrzymujący tablicę znormalizowanych obiektów JSON. Każdy obiekt reprezentuje unikalną ofertę pracy.</p>
 
         <pre><code>[
   {
@@ -73,7 +72,6 @@
         <h2>3. Diagramy Systemowe</h2>
 
         <h3>3.1. Diagram Przypadków Użycia</h3>
-        <p class="desc">Przedstawia główne akcje, jakie użytkownik (Aktor) może wykonać w systemie w wersji MVP.</p>
         <div class="mermaid">
             flowchart LR
             User([Użytkownik])
@@ -94,7 +92,6 @@
         </div>
 
         <h3>3.2. Diagram ERD</h3>
-        <p class="desc">Obrazuje strukturę encji na podstawie modeli bazodanowych z pliku <code>models.py</code> (dla Django) oraz struktury <code>data.json</code>.</p>
         <div class="mermaid">
             erDiagram
             OFFER {
@@ -117,7 +114,6 @@
         </div>
 
         <h3>3.3. Diagram Klas Kluczowych</h3>
-        <p class="desc">Przedstawia główne klasy danych (Modele) oraz logiczne moduły systemu (Scraper, Storage, Stats) odwzorowujące pliki skryptów z kodu.</p>
         <div class="mermaid">
             classDiagram
             class Offer {
@@ -155,7 +151,6 @@
         </div>
 
         <h3>3.4. Diagram Wdrożenia (Deployment)</h3>
-        <p class="desc">Ukazuje architekturę fizyczną systemu – jak lokalne środowisko użytkownika komunikuje się z zewnętrznym portalem IT.</p>
         <div class="mermaid">
             flowchart TD
             node1(("Urządzenie Użytkownika<br>Konsola CMD / Przeglądarka Web"))
@@ -181,16 +176,15 @@
 
     <section id="interfejs-webowy">
         <h3>4. Architektura Szablonów (HTML/CSS)</h3>
-        <p>Szablon główny zintegrowany jest ze strukturą widoków (<code>views.py</code>) w architekturze MVT (Model-View-Template). Logika prezentacji opiera się na trzech głównych segmentach:</p>
         <ol>
-            <li><strong>Panel nawigacyjno-filtrujący:</strong> Zbudowany na bazie formularza wysyłającego żądania <code>GET</code>. Przekazuje parametry sterujące (<code>tags</code>, <code>mode</code>, <code>sort</code>) bez konieczności przeładowywania stanu serwera. Zastosowano tu nowoczesne układy typu Flexbox do zachowania responsywności (RWD).</li>
+            <li><strong>Panel nawigacyjno-filtrujący:</strong> Zbudowany na bazie formularza wysyłającego żądania <code>GET</code>. Przekazuje parametry sterujące (<code>tags</code>, <code>mode</code>, <code>sort</code>) bez konieczności przeładowywania stanu serwera.</li>
             <li><strong>Blok analityczny:</strong> Renderowany warunkowo za pomocą tagów Django (<code>{% if stats %}</code>). Wykorzystuje siatkę CSS Grid do estetycznego układu wartości liczbowych wyliczonych przez backend (moduł <code>stats_calculator.py</code>).</li>
             <li><strong>Iteracyjny blok danych:</strong> Renderowanie wierszy z wykorzystaniem pętli <code>{% for offer in offers %}</code>, która mapuje dane z bazy SQL na obiekty wizualne (karty), dbając o obsługę brakujących danych (fallback poprzez filtr <code>default:"?"</code>).</li>
         </ol>
     </section>
     <section id="dokumentacja-uzytkownika">
-        <h2>5. Dokumentacja Użytkownika (Instrukcja Obsługi)</h2>
-        <p>Niniejsza dokumentacja krok po kroku wyjaśnia, jak poprawnie korzystać z systemu <strong>Analizator Ofert IT</strong> – od pobrania najnowszych ogłoszeń, przez ich filtrowanie, aż po analizę w przeglądarce i za pomocą sztucznej inteligencji.</p>
+        <h2>5. Dokumentacja Użytkownika</h2>
+        <p>Niniejsza dokumentacja krok po kroku wyjaśnia, jak poprawnie korzystać z systemu </p>
 
         <h3>Krok 1: Uruchomienie środowiska i serwera</h3>
         <ol>
