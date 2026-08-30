@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompletna Dokumentacja Techniczna - Aplikacja Analizująco-Kalkulująca Płace (MVP)</title>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true });
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
+        h1, h2, h3, h4 { color: #2c3e50; }
+        h1 { border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 30px; }
+        .section { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #3498db; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a { color: #3498db; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin-top: 5px; }
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .tag { background: #e1f0fa; color: #2980b9; padding: 5px 10px; border-radius: 15px; font-size: 0.9em; font-weight: bold; }
+        code { background-color: #eee; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+        pre { background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; border: 1px solid #ddd; }
+        .mermaid { text-align: center; margin: 30px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        p.desc { color: #666; font-size: 0.95em; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Dokumentacja Techniczna </h1>
+
+    <div class="section">
+        <h2>1. Architektura Systemu i Moduły</h2>
+        <p>Aplikacja opiera się na modułowej architekturze, gdzie każdy plik odpowiada za pojedynczy kontekst biznesowy.</p>
+
+        <h3>Opis Modułów:</h3>
+        <ul>
+            <li><code>main.py</code>: Główny punkt wejścia (Entrypoint) dla interfejsu konsolowego. Zarządza menu użytkownika i orkiestruje wywołania do pozostałych modułów. Posiada dodatkowe funkcje do wyświetlania top tagów po przetworzeniu danych wejściowych.</li>
+            <li><code>scraper.py</code>: Skrypt automatyzacyjny wykorzystujący bibliotekę <strong>Playwright</strong> do renderowania strony JustJoinIT. Posiada zestaw wyrażeń regularnych wyciągających surowe dane z kart ofert (tytuł, wynagrodzenie, tryb pracy, typ umowy, tagi technologiczne).</li>
+            <li><code>update.py</code>: Moduł łączący pobieranie danych ze scrapera z zapisem ich na dysk. Po pobraniu inicjuje proces czyszczenia wywołując logikę normalizacji.</li>
+            <li><code>normalize_data.py</code>: Skrypt czyszczący strukturę danych. Definiuje stabilną sygnaturę oferty w celu usunięcia duplikatów. Standaryzuje zapis jednostek walut i rozdziela sklejone stawki godzinowe od miesięcznych.</li>
+            <li><code>storage.py</code>: Warstwa dostępu do danych (Data Access Layer). Moduł izoluje logikę zapisu i odczytu z lokalnego pliku <code>data.json</code>. Definiuje również klucz <code>_offer_key</code> zapobiegający dodaniu duplikatów w trakcie aktualizacji (np. z tej samej daty).</li>
+            <li><code>filters.py</code>: Moduł operujący na przetrzymywanej w pamięci liście słowników. Oferuje funkcję wykluczającą lub filtrującą oferty według zadanych kryteriów (tagi, tryb pracy, zakres dat).</li>
+            <li><code>stats_calculator.py</code>: Moduł odpowiedzialny za analizę liczbową. Filtruje dane według zadanych tagów z wykorzystaniem arytmetyki zbiorów (logika <code>issubset</code> dla AND, <code>isdisjoint</code> dla OR) i przy użyciu biblioteki <code>statistics</code> oblicza wskaźniki płacowe.</li>
+            <li><code>analytics.py</code>: Moduł agregacyjny. Posiada funkcje pomocnicze do sortowania i wyświetlania w konsoli tzw. "Top Tagów" wyliczanych poprzez analizę częstotliwości wystąpień oraz wyciągania globalnych statystyk dla całego zbioru danych.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2. Struktura Danych (data.json)</h2>
+        <p>Główną i jedyną bazą danych dla wymagań MVP jest płaski plik <code>data.json</code> przetrzymujący tablicę znormalizowanych obiektów JSON. Każdy obiekt reprezentuje unikalną ofertę pracy.</p>
+
+        <pre><code>[
+  {
+    "title": "Python Developer",
+    "tags": ["Python", "Django", "SQL"],
+    "salary_min": "15000",
+    "salary_max": "20000",
+    "currency": "PLN",
+    "hourly_min": null,
+    "hourly_max": null,
+    "hourly_currency": null,
+    "work_mode": "Remote",
+    "contract_type": "B2B",
+    "date": "2024-03-15"
+  }
+]</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Diagramy Systemowe</h2>
+
+        <h3>3.1. Diagram Przypadków Użycia</h3>
+        <p class="desc">Przedstawia główne akcje, jakie użytkownik (Aktor) może wykonać w systemie w wersji MVP.</p>
+        <div class="mermaid">
+            flowchart LR
+            User([Użytkownik])
+
+            subgraph Aplikacja[Aplikacja Analizująco-Kalkulująca]
+            UC1([1. Aktualizacja ofert / Web Scraping])
+            UC2([2. Przeglądanie Top Tagów i statystyk])
+            UC3([3. Filtrowanie ofert wg daty/umowy])
+            UC4([4. Kalkulacja zarobków z logiką AND/OR])
+            UC5([5. Przeglądanie ofert w interfejsie Web])
+            end
+
+            User --> UC1
+            User --> UC2
+            User --> UC3
+            User --> UC4
+            User --> UC5
+        </div>
+
+        <h3>3.2. Diagram ERD</h3>
+        <p class="desc">Obrazuje strukturę encji na podstawie modeli bazodanowych z pliku <code>models.py</code> (dla Django) oraz struktury <code>data.json</code>.</p>
+        <div class="mermaid">
+            erDiagram
+            OFFER {
+            int id PK
+            string title
+            string company
+            int salary_min
+            int salary_max
+            string currency
+            string work_mode
+            string contract_type
+            datetime published_at
+            }
+            TAG {
+            int id PK
+            string name
+            }
+
+            OFFER }o--o{ TAG : "posiada (relacja wiele-do-wielu)"
+        </div>
+
+        <h3>3.3. Diagram Klas Kluczowych</h3>
+        <p class="desc">Przedstawia główne klasy danych (Modele) oraz logiczne moduły systemu (Scraper, Storage, Stats) odwzorowujące pliki skryptów z kodu.</p>
+        <div class="mermaid">
+            classDiagram
+            class Offer {
+            +String title
+            +Integer salary_min
+            +Integer salary_max
+            +String work_mode
+            +String contract_type
+            +mean_salary() float
+            }
+            class Tag {
+            +String name
+            }
+            class Scraper_Module {
+            +fetch_offers(limit) list
+            -extract_salary(text) tuple
+            -extract_tags(card) list
+            }
+            class Storage_Module {
+            +load_data() list
+            +save_data(data)
+            +append_data(new_offers) int
+            }
+            class StatsCalculator_Module {
+            +calculate_stats(data, tags, logic)
+            +get_offer_salary(offer) float
+            }
+            class Filters_Module {
+            +filter_offers(...) list
+            }
+
+            Offer "*" -- "*" Tag : Many-to-Many
+            Scraper_Module ..> Storage_Module : Zapisuje pobrane dane
+            StatsCalculator_Module ..> Filters_Module : Korzysta z wyselekcjonowanych
+        </div>
+
+        <h3>3.4. Diagram Wdrożenia (Deployment)</h3>
+        <p class="desc">Ukazuje architekturę fizyczną systemu – jak lokalne środowisko użytkownika komunikuje się z zewnętrznym portalem IT.</p>
+        <div class="mermaid">
+            flowchart TD
+            node1(("Urządzenie Użytkownika<br>Konsola CMD / Przeglądarka Web"))
+
+            subgraph Srodowisko_Lokalne[Środowisko Lokalne - Localhost]
+            node2["Serwer Aplikacyjny<br>Python 3 / Django"]
+            node3[("System Plików<br>data.json")]
+            node4[("Baza Danych<br>MariaDB / SQLite")]
+
+            node2 <-->
+                |I/O Odczyt/Zapis| node3
+                node2 <-->
+                    |ORM| node4
+                    end
+
+                    node5(("Zewnętrzny Portal<br>JustJoinIT"))
+
+                    node1 <-->
+                        |Obsługa CLI / HTTP| node2
+                        node2 <-->|Skrypt Playwright<br>Scraping HTML| node5
+        </div>
+    </div>
+
+    <section id="interfejs-webowy">
+        <h3>4. Architektura Szablonów (HTML/CSS)</h3>
+        <p>Szablon główny zintegrowany jest ze strukturą widoków (<code>views.py</code>) w architekturze MVT (Model-View-Template). Logika prezentacji opiera się na trzech głównych segmentach:</p>
+        <ol>
+            <li><strong>Panel nawigacyjno-filtrujący:</strong> Zbudowany na bazie formularza wysyłającego żądania <code>GET</code>. Przekazuje parametry sterujące (<code>tags</code>, <code>mode</code>, <code>sort</code>) bez konieczności przeładowywania stanu serwera. Zastosowano tu nowoczesne układy typu Flexbox do zachowania responsywności (RWD).</li>
+            <li><strong>Blok analityczny:</strong> Renderowany warunkowo za pomocą tagów Django (<code>{% if stats %}</code>). Wykorzystuje siatkę CSS Grid do estetycznego układu wartości liczbowych wyliczonych przez backend (moduł <code>stats_calculator.py</code>).</li>
+            <li><strong>Iteracyjny blok danych:</strong> Renderowanie wierszy z wykorzystaniem pętli <code>{% for offer in offers %}</code>, która mapuje dane z bazy SQL na obiekty wizualne (karty), dbając o obsługę brakujących danych (fallback poprzez filtr <code>default:"?"</code>).</li>
+        </ol>
+    </section>
+    <section id="dokumentacja-uzytkownika">
+        <h2>5. Dokumentacja Użytkownika (Instrukcja Obsługi)</h2>
+        <p>Niniejsza dokumentacja krok po kroku wyjaśnia, jak poprawnie korzystać z systemu <strong>Analizator Ofert IT</strong> – od pobrania najnowszych ogłoszeń, przez ich filtrowanie, aż po analizę w przeglądarce i za pomocą sztucznej inteligencji.</p>
+
+        <h3>Krok 1: Uruchomienie środowiska i serwera</h3>
+        <ol>
+            <li>Upewnij się, że uruchomiłeś lokalny serwer bazy danych (np. MariaDB) w panelu kontrolnym <strong>XAMPP</strong>.</li>
+            <li>Otwórz wiersz poleceń (terminal) w folderze głównym projektu.</li>
+            <li>Aby uruchomić aplikację webową (interfejs graficzny Django), wpisz komendę:<br> <code>python manage.py runserver</code></li>
+            <li>Otwórz przeglądarkę internetową i wejdź pod adres: <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>. Zobaczysz tam główny panel kalkulatora.</li>
+        </ol>
+
+        <h3>Krok 2: Aktualizacja bazy ofert (Narzędzie konsolowe Scraper)</h3>
+        <p>Aby system miał na czym pracować, najpierw pobierz świeże dane z rynku pracy używając dedykowanego narzędzia w terminalu:</p>
+        <ol>
+            <li>Otwórz nowe okno terminala w folderze projektu.</li>
+            <li>Uruchom główny skrypt wpisując: <code>python main.py</code>.</li>
+            <li>Z wyświetlonego menu wybierz opcję <strong>1. Aktualizuj dane (scraper)</strong>.</li>
+            <li>Poczekaj, aż skrypt (Playwright) pobierze w tle ogłoszenia (system samodzielnie zamknie wyskakujące okienka cookies, przetworzy tagi, widełki płacowe i tryb pracy, a następnie zapisze je do bazy danych).</li>
+        </ol>
+
+        <h3>Krok 3: Wyszukiwanie i filtrowanie ofert w panelu webowym</h3>
+        <p>Wróć do przeglądarki (<a href="http://localhost:8000">localhost:8000</a>). Znajdziesz tam wyszukiwarkę z zaawansowanymi filtrami:</p>
+        <ul>
+            <li><strong>Tagi:</strong> Wpisz poszukiwane technologie (np. <code>python, sql, django</code>), oddzielając je przecinkiem.</li>
+            <li><strong>Logika wyszukiwania:</strong>
+                <ul>
+                    <li>Wybierz <strong>Wszystkie tagi (AND)</strong>, jeśli chcesz znaleźć oferty pracy wymagające <em>wszystkich</em> wpisanych technologii naraz.</li>
+                    <li>Wybierz <strong>Dowolny z tagów (OR)</strong>, jeśli wystarczy, by w ogłoszeniu pojawiła się <em>chociaż jedna</em> ze wskazanych umiejętności.</li>
+                </ul>
+            </li>
+            <li><strong>Sortowanie:</strong> Ułóż wyniki od najnowszych, od najwyższej lub od najniższej oferowanej pensji.</li>
+        </ul>
+        <p>Zatwierdź wybór przyciskiem <strong>Szukaj</strong>.</p>
+
+        <h3>Krok 4: Odczytywanie statystyk i wyników</h3>
+        <p>Po przefiltrowaniu bazy, na ekranie pojawią się dynamicznie wygenerowane dane:</p>
+        <ol>
+            <li><strong>Kafelki analityczne:</strong> Wyróżniona sekcja wyświetli średnią arytmetyczną pensję, medianę oraz skrajne widełki (najniższą i najwyższą stawkę PLN) wyliczone <em>tylko</em> dla wyszukiwanych przez Ciebie tagów.</li>
+            <li><strong>Lista ogłoszeń:</strong> Poniżej znajduje się czytelna lista konkretnych ofert pracy, prezentująca tytuł stanowiska, walutę, widełki oraz przejrzyście oznaczone tagi w formie "odznak".</li>
+        </ol>
+
+    </section>
+</body>
+</html>
