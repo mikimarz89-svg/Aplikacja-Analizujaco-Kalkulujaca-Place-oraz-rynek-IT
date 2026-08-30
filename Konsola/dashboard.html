@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analizator Ofert IT</title>
+</head>
+<body>
+    <h1>Kalkulator Statystyk IT</h1>
+
+    <form method="GET" action="">
+        <label>Tagi (po przecinku):</label>
+        <input type="text" name="tags" value="{{ search_tags }}">
+
+        <label>Sortuj po:</label>
+        <select name="sort">
+            <option value="">Brak</option>
+            <option value="date" {% if current_sort= ='date' %}selected{% endif %}>Od najnowszych</option>
+            <option value="highest" {% if current_sort= ='highest' %}selected{% endif %}>Od najwy¿szej pensji</option>
+            <option value="lowest" {% if current_sort= ='lowest' %}selected{% endif %}>Od najni¿szej pensji</option>
+        </select>
+
+        <button type="submit">Szukaj</button>
+    </form>
+
+    <hr>
+
+    <h2>Znaleziono: {{ count }} ofert</h2>
+
+    <ul>
+        {% for offer in offers %}
+        <li>
+            <strong>{{ offer.title|default:"Brak tytu³u" }}</strong>
+            | {{ offer.salary_min|default:"?" }} - {{ offer.salary_max|default:"?" }} {{ offer.currency|default:"PLN" }}
+            <br>
+            <small>Tagi: {{ offer.tags|join:", " }}</small>
+        </li>
+        {% empty %}
+        <li>Brak ofert spe³niaj¹cych kryteria.</li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
