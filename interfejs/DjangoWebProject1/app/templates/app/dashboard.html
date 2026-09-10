@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Analizator Ofert IT</title>
+</head>
+<body>
+    <h1>Kalkulator Statystyk IT</h1>
+
+    <form method="GET" action="">
+        <label>Tagi (po przecinku):</label>
+        <input type="text" name="tags" value="{{ search_tags }}">
+
+        <label>Logika:</label>
+        <select name="mode">
+            <option value="OR" {% if current_mode == 'OR' %}selected{% endif %}>Dowolny z tagów (OR)</option>
+            <option value="AND" {% if current_mode == 'AND' %}selected{% endif %}>Wszystkie tagi (AND)</option>
+        </select>
+
+        <label>Sortuj po:</label>
+        <select name="sort">
+            <option value="">Brak</option>
+            <option value="date" {% if current_sort == 'date' %}selected{% endif %}>Od najnowszych</option>
+            <option value="highest" {% if current_sort == 'highest' %}selected{% endif %}>Od najwyższej pensji</option>
+            <option value="lowest" {% if current_sort == 'lowest' %}selected{% endif %}>Od najniższej pensji</option>
+        </select>
+
+        <button type="submit">Szukaj</button>
+    </form>
+
+    <hr>
+
+    {% if stats %}
+    <div style="background-color: #f8f9fa; padding: 15px; border: 1px solid #ccc; margin-bottom: 20px;">
+        <h3>📊 Statystyki dla wyszukiwania: {{ search_tags }}</h3>
+        <ul>
+            <li>Średnia: <strong>{{ stats.mean }} PLN</strong></li>
+            <li>Mediana: <strong>{{ stats.median }} PLN</strong></li>
+            <li>Najniższa wartość: <strong>{{ stats.min }} PLN</strong></li>
+            <li>Najwyższa wartość: <strong>{{ stats.max }} PLN</strong></li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <h2>Znaleziono: {{ count }} ofert</h2>
+
+    <ul>
+        {% for offer in offers %}
+        <li style="margin-bottom: 10px;">
+            <strong>{{ offer.title|default:"Brak tytułu" }}</strong>
+            | {{ offer.salary_min|default:"?" }} - {{ offer.salary_max|default:"?" }} {{ offer.currency|default:"PLN" }}
+            <br>
+            <small>
+                Tagi:
+                {% for tag in offer.tags.all %}
+                    {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    Brak tagów
+                {% endfor %}
+            </small>
+        </li>
+        {% empty %}
+        <li>Brak ofert do wyświetlenia.</li>
+        {% endfor %} 
+    </ul>
+
+</body>
+</html>
