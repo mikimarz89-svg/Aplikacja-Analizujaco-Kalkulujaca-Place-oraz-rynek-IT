@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dokumentacja kodu</title>
+</head>
+<body>
+
+    <h1>Filters.py</h1>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>filter_offers( offers: list[dict], required_tags=None, excluded_tags=None, mode='AND', work_mode=None, contract_type=None, date_from=None, date_to=None )</li>
+    </ul>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>argparse</li>
+        <li>filters</li>
+        <li>json</li>
+        <li>logging</li>
+        <li>re</li>
+        <li>statistics</li>
+        <li>stats_calculator</li>
+        <li>sys</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>clean_number(s: str) -> int</li>
+        <li>
+            collect_tag_stats_from_file(file_path: Union[str, pathlib._local.Path]) -> Dict[str, Dict]
+            <br>Zwraca mapę tag -> {'count': int, 'salaries': List[float]}
+        </li>
+        <li>
+            collect_tags_from_file(file_path: Union[str, pathlib._local.Path]) -> collections.Counter
+            <br>Zwraca Counter wszystkich tagów znalezionych w pliku JSON.
+        </li>
+        <li>detect_unit(tags_join: str) -> Optional[str]</li>
+        <li>filter_menu(offers)</li>
+        <li>main()</li>
+        <li>
+            normalize_file(file_path: Union[str, pathlib._local.Path]) -> Dict[str, Union[int, str]]
+            <br>Normalizuje zawartość pliku JSON z ofertami.
+            <br>Usuwa duplikaty opierając się na stabilnej sygnaturze.
+        </li>
+        <li>normalize_offer(o: dict) -> dict</li>
+        <li>print_summary(data)</li>
+        <li>print_tags_from_file( file_path: Union[str, pathlib._local.Path], top: Optional[int] = None, sort_by: str = 'count' )</li>
+        <li>show_tags()</li>
+    </ul>
+
+    <h2>Data</h2>
+    <ul>
+        <li>DATA_FILE = 'data.json'</li>
+        <li>DAY_UNIT = re.compile('\/day', re.IGNORECASE)</li>
+        <li>Dict = typing.Dict</li>
+        <li>HOUR_UNIT = re.compile('\/h', re.IGNORECASE)</li>
+        <li>List = typing.List</li>
+        <li>MONTH_UNIT = re.compile('\/month', re.IGNORECASE)</li>
+        <li>Optional = typing.Optional</li>
+        <li>PURE_NUMBER_RE = re.compile('^\s*\d[\d\s\u00a0]*\s*$')</li>
+        <li>RANGE_RE = re.compile('(\d[\d\s\u00a0]*)\s*[-–—]\s*(\d[\d\s\u00a0]*)')</li>
+        <li>SIMPLE_RANGE_RE = re.compile('^\s*\d[\d\s\u00a0]*\s*[-–—]\s*\d[\d\s\u00a0]*\s*$')</li>
+        <li>SINGLE_RE = re.compile('(\d[\d\s\u00a0]+)')</li>
+        <li>UNIT_ONLY_RE = re.compile('^(PLN(\/month|\/h|\/day|\/year)?|EUR|€|zł)$', re.IGNORECASE)</li>
+        <li>UNIT_RE = re.compile('(PLN(\/month|\/h|\/day|\/year)?|EUR|€|zł)', re.IGNORECASE)</li>
+        <li>Union = typing.Union</li>
+        <li>YEAR_UNIT = re.compile('\/year', re.IGNORECASE)</li>
+    </ul>
+
+
+    <h1>Normalize_data.py</h1>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>argparse</li>
+        <li>json</li>
+        <li>logging</li>
+        <li>re</li>
+        <li>sys</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>build_argparser() -> argparse.ArgumentParser</li>
+        <li>clean_number(s: str) -> int</li>
+        <li>
+            collect_tags_from_file(file_path: Union[str, pathlib._local.Path]) -> collections.Counter
+            <br>Zwraca Counter wszystkich tagów znalezionych w pliku JSON.
+            <br>Filtruje przedziały liczbowe i tagi-składające-się-tylko-z-liczb/jednostek,
+            <br>żeby nie pokazywać widełek jako tagów.
+        </li>
+        <li>detect_unit(tags_join: str) -> Optional[str]</li>
+        <li>main(path: Optional[str] = None)</li>
+        <li>
+            normalize_file(file_path: Union[str, pathlib._local.Path]) -> Dict[str, Union[str, int]]
+            <br>Normalizuje zawartość pliku JSON z ofertami.
+            <br>Usuwa duplikaty opierając się na stabilnej sygnaturze:
+            <br>&nbsp;&nbsp;(title.lower().strip(), salary_min, salary_max, work_mode, contract_type)
+            <br>Zwraca słownik z metadanymi: {'file', 'backup', 'normalized_count', 'duplicates_removed', 'updated_at'}
+        </li>
+        <li>normalize_offer(o: dict) -> dict</li>
+        <li>normalize_tags_cli(tags_input: str) -> dict</li>
+        <li>
+            parse_tags_input(s: str) -> List[str]
+            <br>Parsuje input tagów:
+            <br>&nbsp;- JSON array (np. '["33 600","PLN/month"]')
+            <br>&nbsp;- przecinki lub średniki rozdzielające
+            <br>&nbsp;- whitespace-separated
+            <br>Zwraca listę stringów (tagów).
+        </li>
+        <li>print_tags_from_file( file_path: Union[str, pathlib._local.Path], top: Optional[int] = None )</li>
+    </ul>
+
+    <h2>Data</h2>
+    <ul>
+        <li>DAY_UNIT = re.compile('\/day', re.IGNORECASE)</li>
+        <li>Dict = typing.Dict</li>
+        <li>HOUR_UNIT = re.compile('\/h', re.IGNORECASE)</li>
+        <li>List = typing.List</li>
+        <li>MONTH_UNIT = re.compile('\/month', re.IGNORECASE)</li>
+        <li>Optional = typing.Optional</li>
+        <li>PURE_NUMBER_RE = re.compile('^\s*\d[\d\s\u00a0]*\s*$')</li>
+        <li>RANGE_RE = re.compile('(\d[\d\s\u00a0]*)\s*[-–—]\s*(\d[\d\s\u00a0]*)')</li>
+        <li>SIMPLE_RANGE_RE = re.compile('^\s*\d[\d\s\u00a0]*\s*[-–—]\s*\d[\d\s\u00a0]*\s*$')</li>
+        <li>SINGLE_RE = re.compile('(\d[\d\s\u00a0]+)')</li>
+        <li>UNIT_ONLY_RE = re.compile('^(PLN(\/month|\/h|\/day|\/year)?|EUR|€|zł)$', re.IGNORECASE)</li>
+        <li>UNIT_RE = re.compile('(PLN(\/month|\/h|\/day|\/year)?|EUR|€|zł)', re.IGNORECASE)</li>
+        <li>Union = typing.Union</li>
+        <li>YEAR_UNIT = re.compile('\/year', re.IGNORECASE)</li>
+    </ul>
+
+
+    <h1>scraper.py</h1>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>re</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>clean_text(text: str) -> str</li>
+        <li>dismiss_cookies(page) -> None</li>
+        <li>extract_contract_type(raw_text: str) -> str | None</li>
+        <li>extract_hourly_rate(text: str) -> tuple[str | None, str | None, str | None]</li>
+        <li>extract_offer_data(card_link) -> dict | None</li>
+        <li>extract_salary(raw_text: str) -> tuple[str | None, str | None, str | None]</li>
+        <li>extract_tags(raw_text: str, title: str) -> list[str]</li>
+        <li>extract_work_mode(raw_text: str) -> str | None</li>
+        <li>fetch_offers(limit: int = 0) -> list[dict]</li>
+    </ul>
+
+
+    <h1>stats_calculator.py</h1>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>json</li>
+        <li>statistics</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>
+            calculate_stats(data: list, selected_tags: set, logic: str = 'AND') -> None
+            <br>Filtruje dane i oblicza/wyświetla statystyki w konsoli.
+        </li>
+        <li>
+            get_offer_salary(offer: dict) -> float | None
+            <br>Oblicza uśrednione wynagrodzenie miesięczne dla pojedynczej oferty na podstawie widełek.
+        </li>
+        <li>main()</li>
+    </ul>
+
+
+    <h1>storage.py</h1>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>json</li>
+        <li>os</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>
+            append_data(new_offers: List[Dict]) -> int
+            <br>Dokłada nowe oferty do pliku <code>data.json</code>, pomijając duplikaty.
+            <br>Zwraca liczbę dodanych ofert.
+        </li>
+        <li>load_data() -> List[Dict]</li>
+        <li>save_data(data: List[Dict]) -> None</li>
+    </ul>
+
+    <h2>Data</h2>
+    <ul>
+        <li>DATA_FILE = 'data.json'</li>
+        <li>Dict = typing.Dict</li>
+        <li>List = typing.List</li>
+        <li>Tuple = typing.Tuple</li>
+    </ul>
+
+
+    <h1>sync_to_django.py</h1>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>django</li>
+        <li>json</li>
+        <li>os</li>
+        <li>sys</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>sync_data()</li>
+    </ul>
+
+    <h2>Data</h2>
+    <ul>
+        <li>CURRENT_DIR = r'C:\Users\Mikolaj\source\repos\PythonApplication3\Konsola'</li>
+        <li>DJANGO_PROJECT_DIR = r'C:\Users\Mikolaj\source\repos\PythonApplication3\interfejs\DjangoWebProject1'</li>
+        <li>ROOT_DIR = r'C:\Users\Mikolaj\source\repos\PythonApplication3'</li>
+    </ul>
+
+
+    <h1>update.py</h1>
+
+    <h2>Modules</h2>
+    <ul>
+        <li>normalize_data</li>
+        <li>sync_to_django</li>
+    </ul>
+
+    <h2>Functions</h2>
+    <ul>
+        <li>update_data()</li>
+    </ul>
+
+</body>
+</html>
